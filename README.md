@@ -1,2 +1,2 @@
-# git_cash_commands
+# git_bash_commands
 git bash commands
