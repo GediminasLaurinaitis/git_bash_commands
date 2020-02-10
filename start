@@ -1,0 +1,40 @@
+#!/bin/bash
+
+RED='\e[31m'
+NOCOLOR='\033[0m'
+GREEN='\e[92m'
+
+CURRENTDATE=`date +"%Y%m%d"`
+
+if [ -z "$1" ]
+  then
+    echo -e "${GREEN}Starting environment for master"
+    git add .;
+    CURRENTBRANCH=$(git branch | grep \* | cut -d ' ' -f2);
+    if [ $CURRENTBRANCH != "master" ]; then
+      git commit -m "stash_$(git branch | grep \* | cut -d ' ' -f2)";
+    fi
+    git checkout master;
+    git pull;
+    php -d memory_limit=-1 /c/composer/composer.phar install;
+    php -d memory_limit=-1 bin/console d:m:m --no-interaction ;
+  else
+    echo -e "${GREEN}Starting environment for task $1"
+     git add .;
+     CURRENTBRANCH=$(git branch | grep \* | cut -d ' ' -f2);
+     if [ $CURRENTBRANCH != "master" ]; then
+       git commit -m "stash_$(git branch | grep \* | cut -d ' ' -f2)";
+     fi
+     git checkout master;
+     git pull;
+     git checkout "$1";
+     LASTCOMMITMESSAGE=$(git log --oneline --format=%B -n 1 HEAD | head -n 1);
+     if [ $LASTCOMMITMESSAGE == "stash_$1" ]; then
+        git reset HEAD~1
+     fi
+     git pull;
+     php -d memory_limit=-1 /c/composer/composer.phar install;
+     php -d memory_limit=-1 bin/console d:m:m --no-interaction ;
+fi
+
+
