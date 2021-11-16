@@ -1,0 +1,98 @@
+#!/bin/bash
+
+RED='\e[31m'
+NOCOLOR='\033[0m'
+GREEN='\e[92m'
+
+if [ -z "$1" ]
+  then
+    echo -e "${GREEN}Updating current branch with master"
+    CURRENTBRANCH=$(git branch | grep \* | cut -d ' ' -f2);
+    CURRENTDIRECTORY=${PWD##*/};
+    git stash;
+    git checkout master;
+    git pull;
+    git checkout "$CURRENTBRANCH";
+    git merge master;
+    if ["$CURRENTDIRECTORY" == 'ac-admin']
+      then
+        cd vendor/ft/ac-core-api;
+        ISBRANCHEXISTONBUNDLE=$(git ls-remote --heads origin $CURRENTBRANCH | wc -l);
+        if ["$ISBRANCHEXISTONBUNDLE" -eq 1]
+          then
+            git checkout master;
+            git pull;
+            git checkout "$CURRENTBRANCH";
+            git stash;
+            git merge master;
+            git push;
+            cd ../../..;
+            git merge master;
+            php -d memory_limit=-1 /c/composer/composer.phar require ft/ac-core-api:dev-"$CURRENTBRANCH";
+        fi
+      fi
+    if ["$CURRENTDIRECTORY" == 'is-admin']
+      then
+        cd vendor/ft/is-core-api;
+        ISBRANCHEXISTONBUNDLE=$(git ls-remote --heads origin $CURRENTBRANCH | wc -l);
+        if [$ISBRANCHEXISTONBUNDLE -eq 1]
+          then
+            git checkout master;
+            git pull;
+            git checkout "$CURRENTBRANCH";
+            git stash;
+            git merge master;
+            git push;
+            cd ../../..;
+            git merge master;
+            php -d memory_limit=-1 /c/composer/composer.phar require ft/is-core-api:dev-"$CURRENTBRANCH";
+        fi
+     fi
+     git stash pop;
+  else
+      echo -e "${GREEN}Updating $1 branch with master"
+    CURRENTBRANCH=$1;
+    CURRENTDIRECTORY=${PWD##*/};
+    git stash;
+    git checkout master;
+    git pull;
+    git checkout "$CURRENTBRANCH";
+    git merge master;
+    if ["$CURRENTDIRECTORY" == 'ac-admin']
+      then
+        cd vendor/ft/ac-core-api;
+        ISBRANCHEXISTONBUNDLE=$(git ls-remote --heads origin $CURRENTBRANCH | wc -l);
+        if [$ISBRANCHEXISTONBUNDLE -eq 1]
+          then
+            git checkout master;
+            git pull;
+            git checkout "$CURRENTBRANCH";
+            git stash;
+            git merge master;
+            git push;
+            cd ../../..;
+            git merge master;
+            php -d memory_limit=-1 /c/composer/composer.phar require ft/ac-core-api:dev-"$CURRENTBRANCH";
+        fi
+      fi
+    if ["$CURRENTDIRECTORY" == 'is-admin']
+      then
+        cd vendor/ft/is-core-api;
+        ISBRANCHEXISTONBUNDLE=$(git ls-remote --heads origin $CURRENTBRANCH | wc -l);
+        if [$ISBRANCHEXISTONBUNDLE -eq 1]
+          then
+            git checkout master;
+            git pull;
+            git checkout "$CURRENTBRANCH";
+            git stash;
+            git merge master;
+            git push;
+            cd ../../..;
+            git merge master;
+            php -d memory_limit=-1 /c/composer/composer.phar require ft/is-core-api:dev-"$CURRENTBRANCH";
+        fi
+     fi
+    git stash pop;
+fi
+
+
